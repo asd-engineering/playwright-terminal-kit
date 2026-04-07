@@ -4,10 +4,8 @@
  * Proves the core value proposition: starting ttyd, connecting Playwright,
  * interacting with a real terminal, and exercising the ASD fzf menu.
  *
- * NOTE: ttyd's xterm.js uses WebGL canvas rendering, so DOM-based text
- * extraction (innerText) returns empty. We use xterm.js's buffer API
- * via page.evaluate() to read terminal content, and pair browser tests
- * with tmux capturePane() for robust text verification.
+ * Uses the library's built-in xterm.js buffer fallback in getContent()
+ * and waitForText() — no standalone helpers needed.
  */
 
 import { test as baseTest, expect, chromium } from "@playwright/test";
@@ -20,45 +18,6 @@ import {
 } from "../src/testing/fixtures.js";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/**
- * Read terminal buffer content via xterm.js internal API.
- * ttyd stores the Terminal instance on `window.term`.
- */
-async function readXtermBuffer(page: import("@playwright/test").Page): Promise<string> {
-  return page.evaluate(() => {
-    // ttyd exposes terminal as window.term
-    const term = (window as any).term;
-    if (!term?.buffer?.active) return "";
-    const buf = term.buffer.active;
-    const lines: string[] = [];
-    for (let i = 0; i < buf.length; i++) {
-      const line = buf.getLine(i);
-      if (line) lines.push(line.translateToString(true));
-    }
-    return lines.join("\n");
-  });
-}
-
-/**
- * Wait for text to appear in the xterm buffer.
- */
-async function waitForXtermText(
-  page: import("@playwright/test").Page,
-  pattern: string,
-  timeoutMs = 10_000
-): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const content = await readXtermBuffer(page);
-    if (content.includes(pattern)) return;
-    await sleep(200);
-  }
-  const finalContent = await readXtermBuffer(page);
-  throw new Error(
-    `Timeout waiting for "${pattern}" in xterm buffer. Last content:\n${finalContent.slice(0, 500)}`
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Test 1: Manual API — ttyd + Playwright interaction
@@ -90,21 +49,21 @@ baseTest.describe("ttyd starts and Playwright interacts with terminal", () => {
       await terminal.focus();
       await terminal.fullScreenshot({ path: "proof/01-terminal-ready.png" });
 
-      // Run echo and verify via xterm buffer API
+      // Run echo and verify via library's built-in buffer fallback
       await terminal.runCommand("echo 'PLAYWRIGHT_PROOF'");
-      await waitForXtermText(page, "PLAYWRIGHT_PROOF");
+      await terminal.waitForText("PLAYWRIGHT_PROOF");
       await terminal.fullScreenshot({ path: "proof/02-echo-output.png" });
 
-      const echoContent = await readXtermBuffer(page);
-      expect(echoContent).toContain("PLAYWRIGHT_PROOF");
+      const echoContent = await terminal.getContent();
+      expect(echoContent.text).toContain("PLAYWRIGHT_PROOF");
 
       // Run ls and verify
       await terminal.runCommand("ls -la");
-      await waitForXtermText(page, "total");
+      await terminal.waitForText("total");
       await terminal.fullScreenshot({ path: "proof/03-ls-output.png" });
 
-      const lsContent = await readXtermBuffer(page);
-      expect(lsContent).toContain("total");
+      const lsContent = await terminal.getContent();
+      expect(lsContent.text).toContain("total");
     } finally {
       await browser.close();
     }
@@ -164,18 +123,18 @@ fixtureTest.describe("fixture system auto-manages lifecycle", () => {
 
   fixtureTest(
     "fixture provides terminal, tmuxSession, takeSnapshot",
-    async ({ terminal, tmuxSession, takeSnapshot, ttydResult, page }) => {
+    async ({ terminal, tmuxSession, takeSnapshot, ttydResult }) => {
       // The fixture auto-started ttyd and navigated
       expect(ttydResult.success).toBe(true);
 
       // Terminal is ready (auto-navigated), focus before typing
       await terminal.focus();
       await terminal.runCommand("echo 'FIXTURE_PROOF'");
-      // xterm.js uses canvas rendering so use buffer API for text
-      await waitForXtermText(page, "FIXTURE_PROOF");
+      // Library's getContent() auto-falls back to xterm buffer for canvas terminals
+      await terminal.waitForText("FIXTURE_PROOF");
 
-      const bufContent = await readXtermBuffer(page);
-      expect(bufContent).toContain("FIXTURE_PROOF");
+      const content = await terminal.getContent();
+      expect(content.text).toContain("FIXTURE_PROOF");
 
       // tmuxSession is provided when configured
       expect(tmuxSession).not.toBeNull();
@@ -223,12 +182,12 @@ baseTest.describe("can interact with ASD fzf menu", () => {
       const menuPath = "/home/kelvin-wuite/ASD/project-prod/scripts/tmux/claude-menu.sh";
       await terminal.runCommand(`bash ${menuPath}`);
 
-      // Wait for fzf to render the prompt (use xterm buffer API)
-      await waitForXtermText(page, "Claude >", 15_000);
+      // Wait for fzf to render the prompt
+      await terminal.waitForText("Claude >", { timeout: 15_000 });
       await terminal.fullScreenshot({ path: "proof/05-fzf-menu-loaded.png" });
 
       // Wait for the header
-      await waitForXtermText(page, "Session Manager", 10_000);
+      await terminal.waitForText("Session Manager", { timeout: 10_000 });
 
       // Type to filter to "list tmux"
       await terminal.type("list tmux");
@@ -236,7 +195,7 @@ baseTest.describe("can interact with ASD fzf menu", () => {
       await terminal.fullScreenshot({ path: "proof/06-fzf-filtered.png" });
 
       // Verify the filtered result shows the tmux listing option
-      await waitForXtermText(page, "List tmux", 5_000);
+      await terminal.waitForText("List tmux", { timeout: 5_000 });
 
       // Select it
       await terminal.press("Enter");
@@ -245,7 +204,7 @@ baseTest.describe("can interact with ASD fzf menu", () => {
 
       // The @list-tmux handler runs `tmux ls` which shows sessions or "no server running"
       // Either output proves the handler executed
-      const text = await readXtermBuffer(page);
+      const { text } = await terminal.getContent();
       const handlerExecuted =
         text.includes("tmux") || text.includes("no server") || text.includes("sessions");
       expect(handlerExecuted).toBe(true);
