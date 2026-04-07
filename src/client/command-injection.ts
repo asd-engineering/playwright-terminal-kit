@@ -203,11 +203,7 @@ export function buildTtydUrl(options: {
  * // http://localhost:7681/?arg=just%20dev%20--port%3D3000
  * ```
  */
-export function buildJustUrl(
-  baseUrl: string,
-  recipe: string,
-  args: string[] = []
-): string {
+export function buildJustUrl(baseUrl: string, recipe: string, args: string[] = []): string {
   const command = ["just", recipe, ...args].join(" ");
   return buildCommandUrl(baseUrl, command);
 }

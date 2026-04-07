@@ -105,10 +105,7 @@ function okStatus(code: number): boolean {
 /**
  * Probe an HTTP endpoint for readiness.
  */
-async function waitForHTTP(
-  url: string,
-  config: ProcessManagerConfig
-): Promise<boolean> {
+async function waitForHTTP(url: string, config: ProcessManagerConfig): Promise<boolean> {
   const deadline = Date.now() + config.httpTimeoutMs;
 
   while (Date.now() < deadline) {
@@ -218,11 +215,7 @@ function isAlive(pid: number): boolean {
 /**
  * Kill a process and optionally its group.
  */
-async function killProcessTree(
-  pid: number,
-  gentleMs: number,
-  killGroup: boolean
-): Promise<void> {
+async function killProcessTree(pid: number, gentleMs: number, killGroup: boolean): Promise<void> {
   // Send SIGTERM
   try {
     if (killGroup && !isWindows) process.kill(-pid, "SIGTERM");

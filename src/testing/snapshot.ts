@@ -189,10 +189,7 @@ export class SnapshotManager {
   /**
    * Load a saved snapshot from disk.
    */
-  async load(
-    testName: string,
-    snapshotName?: string
-  ): Promise<SnapshotFile | null> {
+  async load(testName: string, snapshotName?: string): Promise<SnapshotFile | null> {
     const filePath = this.getSnapshotPath(testName, snapshotName);
 
     if (!existsSync(filePath)) {
@@ -210,10 +207,7 @@ export class SnapshotManager {
   /**
    * Compare a snapshot with the saved version.
    */
-  async compare(
-    testName: string,
-    snapshot: TerminalSnapshot
-  ): Promise<SnapshotCompareResult> {
+  async compare(testName: string, snapshot: TerminalSnapshot): Promise<SnapshotCompareResult> {
     const filePath = this.getSnapshotPath(testName, snapshot.name);
     const actual = this.processContent(snapshot.text);
 
@@ -309,9 +303,7 @@ export class SnapshotManager {
     }
 
     const files = readdirSync(this.config.snapshotDir);
-    return files.filter(
-      (f) => f.startsWith(prefix) && f.endsWith(".snap.json")
-    );
+    return files.filter((f) => f.startsWith(prefix) && f.endsWith(".snap.json"));
   }
 
   /**
@@ -332,9 +324,7 @@ export class SnapshotManager {
 /**
  * Create a snapshot manager with environment-based update mode.
  */
-export function createSnapshotManager(
-  config: Partial<SnapshotConfig> = {}
-): SnapshotManager {
+export function createSnapshotManager(config: Partial<SnapshotConfig> = {}): SnapshotManager {
   return new SnapshotManager({
     ...config,
     updateSnapshots: config.updateSnapshots || process.env.UPDATE_SNAPSHOTS === "1",

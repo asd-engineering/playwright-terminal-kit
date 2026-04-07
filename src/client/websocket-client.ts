@@ -88,9 +88,9 @@ export class WebSocketClient {
       // Set up headers for authentication
       const headers: Record<string, string> = {};
       if (this.config.username && this.config.password) {
-        const auth = Buffer.from(
-          `${this.config.username}:${this.config.password}`
-        ).toString("base64");
+        const auth = Buffer.from(`${this.config.username}:${this.config.password}`).toString(
+          "base64"
+        );
         headers.Authorization = `Basic ${auth}`;
       }
 
@@ -299,9 +299,7 @@ export class WebSocketClient {
   private buildWsUrl(): string {
     const serverUrl = new URL(this.config.server);
     const protocol = serverUrl.protocol === "https:" ? "wss:" : "ws:";
-    const path = this.config.path.startsWith("/")
-      ? this.config.path
-      : `/${this.config.path}`;
+    const path = this.config.path.startsWith("/") ? this.config.path : `/${this.config.path}`;
 
     return `${protocol}//${serverUrl.host}${path}`;
   }

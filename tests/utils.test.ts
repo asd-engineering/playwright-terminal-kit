@@ -96,9 +96,7 @@ describe("key-codes", () => {
 
   describe("keysToBytes", () => {
     it("combines multiple keys", () => {
-      expect(keysToBytes(["hello", "Enter"])).toEqual([
-        104, 101, 108, 108, 111, 13,
-      ]);
+      expect(keysToBytes(["hello", "Enter"])).toEqual([104, 101, 108, 108, 111, 13]);
     });
   });
 
@@ -432,9 +430,7 @@ describe("command-injection", () => {
 
   describe("parseAllCommandsFromUrl", () => {
     it("extracts all commands from URL", () => {
-      const cmds = parseAllCommandsFromUrl(
-        "http://localhost:7681/?arg=cmd1&arg=cmd2"
-      );
+      const cmds = parseAllCommandsFromUrl("http://localhost:7681/?arg=cmd1&arg=cmd2");
       expect(cmds).toEqual(["cmd1", "cmd2"]);
     });
 

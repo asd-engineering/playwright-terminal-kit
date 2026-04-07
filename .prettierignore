@@ -1,0 +1,4 @@
+dist/
+node_modules/
+proof/*.png
+*.snap.json

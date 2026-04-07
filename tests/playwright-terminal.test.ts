@@ -2,17 +2,13 @@
  * Unit tests for PlaywrightTerminal xterm.js buffer fallback
  */
 
-import { describe, it, expect, beforeEach } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { PlaywrightTerminal } from "../src/client/playwright-terminal.js";
 
 /**
  * Create a minimal mock Page that satisfies PlaywrightTerminal's needs.
  */
-function createMockPage(options: {
-  innerText?: string;
-  innerHTML?: string;
-  evaluateResult?: any;
-}) {
+function createMockPage(options: { innerText?: string; innerHTML?: string; evaluateResult?: any }) {
   const { innerText = "", innerHTML = "", evaluateResult = "" } = options;
 
   const locator = {
@@ -164,8 +160,8 @@ describe("PlaywrightTerminal.waitForText with buffer fallback", () => {
     });
     const terminal = new PlaywrightTerminal(page);
 
-    await expect(
-      terminal.waitForText("NEVER_FOUND", { timeout: 500 })
-    ).rejects.toThrow("Timeout waiting for text");
+    await expect(terminal.waitForText("NEVER_FOUND", { timeout: 500 })).rejects.toThrow(
+      "Timeout waiting for text"
+    );
   });
 });

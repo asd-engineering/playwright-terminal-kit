@@ -77,7 +77,11 @@ export class TmuxSession {
   private config: TmuxSessionConfig;
   private created = false;
 
-  constructor(config: TmuxSessionConfig | { sessionName: string } & Partial<Omit<TmuxSessionConfig, "sessionName">>) {
+  constructor(
+    config:
+      | TmuxSessionConfig
+      | ({ sessionName: string } & Partial<Omit<TmuxSessionConfig, "sessionName">>)
+  ) {
     this.config = { ...DEFAULTS, ...config } as TmuxSessionConfig;
   }
 
@@ -86,7 +90,9 @@ export class TmuxSession {
    */
   async create(): Promise<void> {
     if (!isTmuxAvailable()) {
-      throw new Error("tmux is not installed. Install it via: brew install tmux (macOS) or apt install tmux (Ubuntu)");
+      throw new Error(
+        "tmux is not installed. Install it via: brew install tmux (macOS) or apt install tmux (Ubuntu)"
+      );
     }
 
     // Kill existing session if present
@@ -98,9 +104,12 @@ export class TmuxSession {
     const args = [
       "new-session",
       "-d", // detached
-      "-s", sessionName,
-      "-x", String(size.cols),
-      "-y", String(size.rows),
+      "-s",
+      sessionName,
+      "-x",
+      String(size.cols),
+      "-y",
+      String(size.rows),
     ];
 
     if (cwd) {
@@ -205,11 +214,9 @@ export class TmuxSession {
   async capturePane(): Promise<string> {
     this.ensureCreated();
 
-    const result = spawnSync(
-      "tmux",
-      ["capture-pane", "-t", this.config.sessionName, "-p"],
-      { stdio: ["ignore", "pipe", "pipe"] }
-    );
+    const result = spawnSync("tmux", ["capture-pane", "-t", this.config.sessionName, "-p"], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
 
     return result.stdout?.toString() || "";
   }
@@ -220,11 +227,9 @@ export class TmuxSession {
   async captureAnsi(): Promise<string> {
     this.ensureCreated();
 
-    const result = spawnSync(
-      "tmux",
-      ["capture-pane", "-t", this.config.sessionName, "-p", "-e"],
-      { stdio: ["ignore", "pipe", "pipe"] }
-    );
+    const result = spawnSync("tmux", ["capture-pane", "-t", this.config.sessionName, "-p", "-e"], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
 
     return result.stdout?.toString() || "";
   }
@@ -236,10 +241,7 @@ export class TmuxSession {
    * @param timeoutMs - Maximum wait time (default: 10000ms)
    * @returns True if pattern found, false on timeout
    */
-  async waitForText(
-    pattern: string | RegExp,
-    timeoutMs = 10000
-  ): Promise<boolean> {
+  async waitForText(pattern: string | RegExp, timeoutMs = 10000): Promise<boolean> {
     const deadline = Date.now() + timeoutMs;
     const regex = typeof pattern === "string" ? null : pattern;
     const needle = typeof pattern === "string" ? pattern : null;
@@ -327,12 +329,11 @@ export class TmuxSession {
   async resize(cols: number, rows: number): Promise<void> {
     this.ensureCreated();
 
-    spawnSync("tmux", [
-      "resize-window",
-      "-t", this.config.sessionName,
-      "-x", String(cols),
-      "-y", String(rows),
-    ], { stdio: ["ignore", "pipe", "pipe"] });
+    spawnSync(
+      "tmux",
+      ["resize-window", "-t", this.config.sessionName, "-x", String(cols), "-y", String(rows)],
+      { stdio: ["ignore", "pipe", "pipe"] }
+    );
 
     this.config.size = { cols, rows };
     await sleep(50);

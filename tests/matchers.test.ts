@@ -40,7 +40,9 @@ describe("terminalMatchers", () => {
 
     it("supports ignoreCase option", () => {
       const snap = makeSnapshot("Hello World");
-      const result = terminalMatchers.toMatchTerminalText(snap, "hello world", { ignoreCase: true });
+      const result = terminalMatchers.toMatchTerminalText(snap, "hello world", {
+        ignoreCase: true,
+      });
       expect(result.pass).toBe(true);
     });
 
@@ -90,7 +92,9 @@ describe("terminalMatchers", () => {
 
     it("preserves ANSI when stripAnsi is false", () => {
       const content = makeContent("\x1b[32mhello\x1b[0m");
-      const result = terminalMatchers.toContainTerminalText(content, "\x1b[32m", { stripAnsi: false });
+      const result = terminalMatchers.toContainTerminalText(content, "\x1b[32m", {
+        stripAnsi: false,
+      });
       expect(result.pass).toBe(true);
     });
 

@@ -3,19 +3,14 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { existsSync, mkdirSync, rmSync, readFileSync } from "fs";
+import { existsSync, rmSync, readFileSync } from "fs";
 import { join } from "path";
 import { SnapshotManager, createSnapshotManager } from "../src/testing/snapshot.js";
 import type { TerminalSnapshot } from "../src/server/tmux-session.js";
 
 const TEST_DIR = join(import.meta.dir, "__test_snapshots__");
 
-function makeSnapshot(
-  text: string,
-  name = "test-snap",
-  cols = 80,
-  rows = 24
-): TerminalSnapshot {
+function makeSnapshot(text: string, name = "test-snap", cols = 80, rows = 24): TerminalSnapshot {
   return {
     text,
     raw: text,
@@ -187,7 +182,9 @@ describe("SnapshotManager", () => {
 
     it("throws for new snapshots without update mode", async () => {
       const snap = makeSnapshot("new", "assert");
-      await expect(manager.assertMatch("no-saved", snap)).rejects.toThrow("No saved snapshot found");
+      await expect(manager.assertMatch("no-saved", snap)).rejects.toThrow(
+        "No saved snapshot found"
+      );
     });
   });
 
