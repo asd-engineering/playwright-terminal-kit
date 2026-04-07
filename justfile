@@ -12,3 +12,6 @@ publish-dry:
 
 publish:
     npm publish --access public
+
+poc:
+    npx playwright test proof/
