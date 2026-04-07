@@ -1,0 +1,76 @@
+{
+  "name": "@accelerated-software-development/playwright-terminal-kit",
+  "version": "0.1.0",
+  "description": "Playwright testing library for CLI/TUI applications using ttyd and tmux",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./fixtures": {
+      "import": "./dist/testing/fixture.js",
+      "types": "./dist/testing/fixture.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test tests/",
+    "test:e2e": "playwright test examples/",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "ttyd",
+    "tmux",
+    "terminal",
+    "tui",
+    "cli",
+    "testing",
+    "snapshot",
+    "e2e"
+  ],
+  "author": "ASD Engineering",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asd-engineering/playwright-terminal-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/asd-engineering/playwright-terminal-kit/issues"
+  },
+  "homepage": "https://github.com/asd-engineering/playwright-terminal-kit#readme",
+  "dependencies": {
+    "ws": "^8.18.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.0"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": false
+    }
+  }
+}
