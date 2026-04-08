@@ -23,9 +23,10 @@ export const terminalMatchers = {
   ) {
     const { ignoreCase = false, normalize = true } = options || {};
 
-    const text = "normalized" in received
-      ? (received as TerminalSnapshot).normalized
-      : (received as TerminalContent).text;
+    const text =
+      "normalized" in received
+        ? (received as TerminalSnapshot).normalized
+        : (received as TerminalContent).text;
     let actual = normalize ? normalizeTerminalOutput(text) : text;
     let expectedNorm = normalize ? normalizeTerminalOutput(expected) : expected;
 
@@ -79,10 +80,7 @@ export const terminalMatchers = {
   /**
    * Match terminal snapshot matches regex.
    */
-  toMatchTerminalPattern(
-    received: TerminalSnapshot | TerminalContent,
-    pattern: RegExp
-  ) {
+  toMatchTerminalPattern(received: TerminalSnapshot | TerminalContent, pattern: RegExp) {
     const text = "text" in received ? received.text : "";
     const normalized = stripAnsi(text);
     const pass = pattern.test(normalized);
@@ -125,10 +123,7 @@ export const terminalMatchers = {
   /**
    * Match terminal has specific dimensions.
    */
-  toHaveTerminalSize(
-    received: TerminalSnapshot,
-    expected: { cols?: number; rows?: number }
-  ) {
+  toHaveTerminalSize(received: TerminalSnapshot, expected: { cols?: number; rows?: number }) {
     const { cols: expectedCols, rows: expectedRows } = expected;
     const { cols: actualCols, rows: actualRows } = received.size;
 
@@ -182,9 +177,7 @@ export const terminalMatchers = {
 
     const text = "text" in received ? received.text : "";
     const lines = stripAnsi(text).split("\n");
-    const count = ignoreEmpty
-      ? lines.filter((l) => l.trim() !== "").length
-      : lines.length;
+    const count = ignoreEmpty ? lines.filter((l) => l.trim() !== "").length : lines.length;
 
     const pass = count === expected;
 
@@ -236,10 +229,7 @@ declare module "@playwright/test" {
     toShowPrompt(promptPattern?: string | RegExp): R;
     toHaveTerminalSize(expected: { cols?: number; rows?: number }): R;
     toBeEmptyTerminal(): R;
-    toHaveLineCount(
-      expected: number,
-      options?: { ignoreEmpty?: boolean }
-    ): R;
+    toHaveLineCount(expected: number, options?: { ignoreEmpty?: boolean }): R;
   }
 }
 
@@ -250,10 +240,7 @@ export const terminalAssert = {
   /**
    * Assert terminal contains text.
    */
-  containsText(
-    content: TerminalSnapshot | TerminalContent,
-    expected: string
-  ): void {
+  containsText(content: TerminalSnapshot | TerminalContent, expected: string): void {
     const result = terminalMatchers.toContainTerminalText(content, expected);
     if (!result.pass) {
       throw new Error(result.message());
@@ -263,10 +250,7 @@ export const terminalAssert = {
   /**
    * Assert terminal matches pattern.
    */
-  matchesPattern(
-    content: TerminalSnapshot | TerminalContent,
-    pattern: RegExp
-  ): void {
+  matchesPattern(content: TerminalSnapshot | TerminalContent, pattern: RegExp): void {
     const result = terminalMatchers.toMatchTerminalPattern(content, pattern);
     if (!result.pass) {
       throw new Error(result.message());
@@ -276,10 +260,7 @@ export const terminalAssert = {
   /**
    * Assert terminal shows prompt.
    */
-  showsPrompt(
-    content: TerminalSnapshot | TerminalContent,
-    promptPattern?: string | RegExp
-  ): void {
+  showsPrompt(content: TerminalSnapshot | TerminalContent, promptPattern?: string | RegExp): void {
     const result = terminalMatchers.toShowPrompt(content, promptPattern);
     if (!result.pass) {
       throw new Error(result.message());

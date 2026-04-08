@@ -222,7 +222,9 @@ export function parseConfig(config: unknown): PlaywrightTtydConfig {
  * @param config - Configuration to parse
  * @returns Result with data or error
  */
-export function safeParseConfig(config: unknown): z.SafeParseReturnType<unknown, PlaywrightTtydConfig> {
+export function safeParseConfig(
+  config: unknown
+): z.SafeParseReturnType<unknown, PlaywrightTtydConfig> {
   return PlaywrightTtydConfigSchema.safeParse(config);
 }
 

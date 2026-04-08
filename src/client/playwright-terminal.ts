@@ -164,20 +164,67 @@ export class PlaywrightTerminal {
 
   /**
    * Get the current terminal content.
+   * Automatically falls back to xterm.js buffer API when DOM text is empty
+   * (common with WebGL canvas-rendered terminals like ttyd).
    */
   async getContent(): Promise<TerminalContent> {
     const screen = this.page.locator(this.config.xtermScreenSelector);
 
     // Get inner text (browser strips most formatting)
-    const text = await screen.innerText();
+    let text = await screen.innerText();
+    let html = await screen.innerHTML();
 
-    // Get HTML for raw content
-    const html = await screen.innerHTML();
+    // If DOM text is empty/whitespace, fall back to xterm.js buffer API
+    if (!text.trim()) {
+      text = await this.readFromXtermBuffer();
+      html = "";
+    }
 
     // Normalize for comparison
     const normalized = normalizeTerminalOutput(text);
 
     return { html, text, normalized };
+  }
+
+  /**
+   * Read terminal content from xterm.js buffer API.
+   * Tries `window.term` (ttyd) first, then `element._terminal` (generic xterm.js).
+   */
+  private async readFromXtermBuffer(): Promise<string> {
+    try {
+      return await this.page.evaluate(() => {
+        // Try ttyd's window.term first
+        const windowTerm = (window as any).term;
+        const buf = windowTerm?.buffer?.active;
+        if (buf) {
+          const lines: string[] = [];
+          for (let i = 0; i < buf.length; i++) {
+            const line = buf.getLine(i);
+            if (line) lines.push(line.translateToString(true));
+          }
+          return lines.join("\n");
+        }
+
+        // Fall back to element._terminal (generic xterm.js pattern)
+        const terminals = document.querySelectorAll(".xterm");
+        for (const el of terminals) {
+          const term = (el as any)._terminal;
+          const elBuf = term?.buffer?.active;
+          if (elBuf) {
+            const lines: string[] = [];
+            for (let i = 0; i < elBuf.length; i++) {
+              const line = elBuf.getLine(i);
+              if (line) lines.push(line.translateToString(true));
+            }
+            return lines.join("\n");
+          }
+        }
+
+        return "";
+      });
+    } catch {
+      return "";
+    }
   }
 
   /**

@@ -10,14 +10,14 @@
  * - OSC sequences: \x1b]...BEL (titles, hyperlinks)
  * - Control characters: various terminal control codes
  */
-// eslint-disable-next-line no-control-regex
+
 const ANSI_FULL_REGEX =
   /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]|\u001b\].*?(?:\u0007|\u001b\\)/g;
 
 /**
  * Regex for matching terminal control characters.
  */
-// eslint-disable-next-line no-control-regex
+
 const CONTROL_CHARS_REGEX = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g;
 
 /**

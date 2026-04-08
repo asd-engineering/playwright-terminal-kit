@@ -1,6 +1,6 @@
 {
   "name": "@accelerated-software-development/playwright-terminal-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Playwright testing library for CLI/TUI applications using ttyd and tmux",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,10 @@
     "test": "bun test tests/",
     "test:e2e": "playwright test examples/",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts'",
+    "lint:fix": "eslint --fix 'src/**/*.ts' 'tests/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts' 'tests/**/*.ts'",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -61,9 +65,13 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.10.0",
     "@types/ws": "^8.5.13",
-    "typescript": "^5.7.0"
+    "eslint": "^10.2.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.58.0"
   },
   "peerDependencies": {
     "@playwright/test": "^1.40.0"

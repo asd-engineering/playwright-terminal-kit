@@ -6,3 +6,5 @@ local/
 ext/
 .claude/
 bun.lock
+proof/test-results/
+proof/*.png

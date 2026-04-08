@@ -29,11 +29,7 @@
 
 // Server components
 export { TtydServer, createTtydServer, type TtydStartResult } from "./server/ttyd-server.js";
-export {
-  TmuxSession,
-  createTmuxSession,
-  type TerminalSnapshot,
-} from "./server/tmux-session.js";
+export { TmuxSession, createTmuxSession, type TerminalSnapshot } from "./server/tmux-session.js";
 export {
   ProcessManager,
   processManager,
@@ -44,10 +40,7 @@ export {
 } from "./server/process-manager.js";
 
 // Client components
-export {
-  PlaywrightTerminal,
-  type TerminalContent,
-} from "./client/playwright-terminal.js";
+export { PlaywrightTerminal, type TerminalContent } from "./client/playwright-terminal.js";
 export {
   WebSocketClient,
   createWebSocketClient,
@@ -83,11 +76,7 @@ export {
   createSnapshotManager,
   type SnapshotCompareResult,
 } from "./testing/snapshot.js";
-export {
-  terminalMatchers,
-  terminalAssert,
-  extendExpect,
-} from "./testing/matchers.js";
+export { terminalMatchers, terminalAssert, extendExpect } from "./testing/matchers.js";
 
 // Utilities
 export {

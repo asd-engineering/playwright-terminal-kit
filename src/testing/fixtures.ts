@@ -92,9 +92,7 @@ const defaultOptions: TerminalFixtureOptions = {
  * });
  * ```
  */
-export function createTerminalTest(
-  options: Partial<TerminalFixtureOptions> = {}
-) {
+export function createTerminalTest(options: Partial<TerminalFixtureOptions> = {}) {
   const mergedOptions: TerminalFixtureOptions = {
     ...defaultOptions,
     ...options,
@@ -179,19 +177,14 @@ export function createTerminalTest(
       const manager = new SnapshotManager({
         ...mergedOptions.snapshot,
         snapshotDir:
-          mergedOptions.snapshot.snapshotDir ||
-          `${testInfo.project.outputDir}/__snapshots__`,
+          mergedOptions.snapshot.snapshotDir || `${testInfo.project.outputDir}/__snapshots__`,
       });
 
       await use(manager);
     },
 
     // Convenience function for taking snapshots
-    takeSnapshot: async (
-      { tmuxSession, terminal, snapshotManager },
-      use,
-      testInfo
-    ) => {
+    takeSnapshot: async ({ tmuxSession, terminal, snapshotManager }, use, testInfo) => {
       const fn = async (name: string): Promise<TerminalSnapshot> => {
         // Prefer tmux if available (more reliable)
         if (tmuxSession) {
