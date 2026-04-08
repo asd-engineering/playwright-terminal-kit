@@ -1,0 +1,50 @@
+name: Duplication Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+jobs:
+  jscpd:
+    name: Code Duplication
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check duplication in src (strict)
+        run: >
+          npx --yes jscpd
+          --min-lines 8
+          --min-tokens 80
+          --reporters console
+          --threshold 3
+          src/
+
+      - name: Check duplication in tests
+        run: >
+          npx --yes jscpd
+          --min-lines 10
+          --min-tokens 100
+          --reporters console
+          --threshold 10
+          tests/
+
+      - name: Check global duplication guardrail
+        run: >
+          npx --yes jscpd
+          --min-lines 8
+          --min-tokens 80
+          --reporters console
+          --threshold 5
+          --gitignore
+          --ignore "**/node_modules/**,**/.git/**,**/dist/**,**/proof/**"
+          .
